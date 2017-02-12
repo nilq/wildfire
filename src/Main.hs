@@ -27,7 +27,7 @@ foreign import ccall safe "myfunc" myfunc
     :: CInt -> IO ()
 
 initModule :: AST.Module
-initModule = emptyModule "my cool jit"
+initModule = emptyModule "Wildfire JIT"
 
 example :: LLVM ()
 example = do
