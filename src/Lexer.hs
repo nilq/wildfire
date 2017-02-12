@@ -43,6 +43,15 @@ float =
 parens =
   Tok.parens lexer
 
+semiSep =
+  Tok.semiSep lexer
+
+colon =
+  Tok.colon lexer
+
+brackets =
+  Tok.brackets lexer
+
 commaSep =
   Tok.commaSep lexer
 
