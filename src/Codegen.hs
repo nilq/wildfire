@@ -67,26 +67,15 @@ external retty label argtys = addDefn $
                                       }
 
 -- Types
-
 double :: Type
-double = FloatingPointType 64 IEEE
+double =
+  FloatingPointType 64 IEEE
 
 void :: Type
 void =
   AST.VoidType
 
 -- Names
-
-type Names = Map.Map String Int
-
-uniqueName :: String -> Names -> (String, Names)
-uniqueName nm ns =
-  case Map.lookup nm ns of
-    Nothing -> (nm,  Map.insert nm 1 ns)
-    Just ix -> (nm ++ show ix, Map.insert nm (ix+1) ns)
-
-instance IsString Name where
-  fromString = Name . fromString
 
 type Names =
   Map.Map String Int
@@ -165,23 +154,19 @@ fresh = do
                    }
   return $ i + 1
 
-instr :: Instruction -> Codegen (Operand)
-instr ins = do
+instr :: Type -> Instruction -> Codegen (Operand)
+instr ty ins = do
   n <- fresh
   let ref = (UnName n)
   blk <- current
   let i = stack blk
-  modifyBlock ( blk { stack = i ++ [ref := ins]
-                    }
-              )
-  return $ local ref
+  modifyBlock (blk { stack = i ++ [ref := ins] } )
+  return $ local ty ref
 
 terminator :: Named Terminator -> Codegen (Named Terminator)
 terminator trm = do
   blk <- current
-  modifyBlock ( blk { term = Just trm
-                     }
-               )
+  modifyBlock (blk { term = Just trm })
   return trm
 
 -- Block state
@@ -243,38 +228,38 @@ getvar var = do
     Nothing -> error $ "Local variable is nowhere to be found: " ++ show var
 
 -- References
-local :: Name -> Operand
+local ::  Type -> Name -> Operand
 local =
-  LocalReference double
+  LocalReference
 
-global :: Name -> C.Constant
+global :: Type -> Name -> C.Constant
 global =
-  C.GlobalReference double
+  C.GlobalReference
 
-externf :: Name -> Operand
-externf =
-  ConstantOperand . C.GlobalReference double
+externf :: Type -> Name -> Operand
+externf ty nm =
+  ConstantOperand (C.GlobalReference ty nm)
 
 -- Arithmetics
 fadd :: Operand -> Operand -> Codegen Operand
 fadd a b =
-  instr $ FAdd NoFastMathFlags a b []
+  instr float $ FAdd NoFastMathFlags a b []
 
 fsub :: Operand -> Operand -> Codegen Operand
 fsub a b =
-  instr $ FSub NoFastMathFlags a b []
+  instr float $ FSub NoFastMathFlags a b []
 
 fmul :: Operand -> Operand -> Codegen Operand
 fmul a b =
-  instr $ FMul NoFastMathFlags a b []
+  instr float $ FMul NoFastMathFlags a b []
 
 fdiv :: Operand -> Operand -> Codegen Operand
 fdiv a b =
-  instr $ FDiv NoFastMathFlags a b []
+  instr float $ FDiv NoFastMathFlags a b []
 
 fcmp :: FP.FloatingPointPredicate -> Operand -> Operand -> Codegen Operand
 fcmp cond a b =
-  instr $ FCmp cond a b []
+  instr float $ FCmp cond a b []
 
 cons :: C.Constant -> Operand
 cons =
@@ -282,7 +267,7 @@ cons =
 
 uitofp :: Type -> Operand -> Codegen Operand
 uitofp ty a =
-  instr $ UIToFP a ty []
+  instr float $ UIToFP a ty []
 
 toArgs :: [Operand] -> [(Operand, [A.ParameterAttribute])]
 toArgs =
@@ -291,19 +276,19 @@ toArgs =
 -- Effects
 call :: Operand -> [Operand] -> Codegen Operand
 call fn args =
-  instr $ Call Nothing CC.C [] (Right fn) (toArgs args) [] []
+  instr float $ Call Nothing CC.C [] (Right fn) (toArgs args) [] []
 
 alloca :: Type -> Codegen Operand
 alloca ty =
-  instr $ Alloca ty Nothing 0 []
+  instr float $ Alloca ty Nothing 0 []
 
 store :: Operand -> Operand -> Codegen Operand
 store ptr val =
-  instr $ Store False ptr val Nothing 0 []
+  instr float $ Store False ptr val Nothing 0 []
 
 load :: Operand -> Codegen Operand
 load ptr =
-  instr $ Load False ptr Nothing 0 []
+  instr float $ Load False ptr Nothing 0 []
 
 -- Control flow
 br :: Name -> Codegen (Named Terminator)
@@ -316,12 +301,12 @@ cbr cond tr fl =
 
 phi :: Type -> [(Operand, Name)] -> Codegen Operand
 phi ty incoming =
-  instr $ Phi ty incoming []
+  instr float $ Phi ty incoming []
 
 ret :: Operand -> Codegen (Named Terminator)
 ret val =
   terminator $ Do $ Ret (Just val) []
 
 retvoid :: Codegen (Named Terminator)
-ret val =
+retvoid =
   terminator $ Do $ Ret Nothing []

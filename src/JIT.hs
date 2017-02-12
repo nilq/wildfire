@@ -10,6 +10,7 @@ import LLVM.General.Target
 import LLVM.General.Context
 import LLVM.General.CodeModel
 import LLVM.General.Module as Mod
+import qualified LLVM.General.AST as AST
 
 import LLVM.General.PassManager
 import LLVM.General.Transforms
