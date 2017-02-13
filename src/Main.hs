@@ -17,6 +17,9 @@ import qualified LLVM.General.AST.Constant as C
 
 import Foreign.C.Types
 
+foreign import ccall safe "print_char" print_char
+    :: CDouble -> CInt
+
 initModule :: AST.Module
 initModule =
   emptyModule "Wildfire JIT"
