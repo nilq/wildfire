@@ -1,7 +1,7 @@
 # wildfire
 A partly functional language running on LLVM
 
-Syntax ideas
+Syntax approach
 ---
 
 ```fire
