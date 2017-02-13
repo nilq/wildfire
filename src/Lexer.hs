@@ -15,7 +15,6 @@ lexer =
         , "*"
         , "/"
         , ","
-        , "<"
         , ">"
         ]
 
@@ -51,6 +50,9 @@ colon =
 
 brackets =
   Tok.brackets lexer
+
+braces =
+  Tok.braces lexer
 
 commaSep =
   Tok.commaSep lexer

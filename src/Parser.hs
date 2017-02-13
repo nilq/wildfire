@@ -23,7 +23,8 @@ binary s assoc =
   Ex.Infix (reservedOp s >> return (BinaryOp s)) assoc
 
 binops =
-  [ [ binary "*" Ex.AssocLeft
+  [
+    [ binary "*" Ex.AssocLeft
     , binary "/" Ex.AssocLeft
     ]
     ,
@@ -39,29 +40,56 @@ expr :: Parser Expr
 expr =
   Ex.buildExpressionParser binops factor
 
+variable :: Parser Expr
+variable = do
+  Var <$> identifier
+
 function :: Parser Expr
 function = do
   reserved "func"
   name <- identifier
-  args <- (many identifier) colon
-  body <- many (expr semiSep)
-
+  args <- many identifier
+  body <- braces $ expr
   return $ Function name args body
 
 extern :: Parser Expr
 extern = do
   reserved "summon"
   name <- identifier
-  args <- many identifier
-
+  args <- parens $ many identifier
   return $ Extern name args
 
 call :: Parser Expr
 call = do
   name <- identifier
-  args <- commaSep expr
-
+  args <- parens $ commaSep expr
   return $ Call name args
+
+ifthen :: Parser Expr
+ifthen = do
+  reserved "if"
+  cond    <- expr
+  reserved "then"
+  tr       <- expr
+  reserved "else"
+  fl       <- expr
+
+  return $ If cond tr fl
+
+for :: Parser Expr
+for = do
+  reserved "for"
+  var <- identifier
+  reservedOp "="
+  start <- expr
+  reservedOp ","
+  cond <- expr
+  reservedOp ","
+  step <- expr
+  reserved "in"
+  body <- expr
+
+  return $ For var start cond step body
 
 factor :: Parser Expr
 factor =
@@ -78,7 +106,6 @@ defn = try extern
   <|> try function
   <|> expr
 
-
 contents :: Parser a -> Parser a
 contents p = do
   Tok.whiteSpace lexer
@@ -89,7 +116,7 @@ contents p = do
 toplevel :: Parser [Expr]
 toplevel = many $ do
   def <- defn
-  -- reservedOp ";"
+  reservedOp ";"
   return def
 
 parseExpr :: String -> Either ParseError Expr
