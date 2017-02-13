@@ -70,11 +70,17 @@ lt a b = do
   test <- fcmp FP.ULT a b
   uitofp double test
 
+gt :: AST.Operand -> AST.Operand -> Codegen AST.Operand
+gt a b = do
+  test <- fcmp FP.UGT a b
+  uitofp double test
+
 binops = Map.fromList [ ("+", fadd)
                       , ("-", fsub)
                       , ("*", fmul)
                       , ("/", fdiv)
                       , ("<", lt)
+                      , (">", gt)
                       ]
 
 cgen :: S.Expr -> Codegen AST.Operand

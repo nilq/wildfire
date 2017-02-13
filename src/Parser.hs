@@ -33,6 +33,7 @@ binops =
     ]
     ,
     [ binary "<" Ex.AssocLeft
+    , binary ">" Ex.AssocLeft
     ]
   ]
 
@@ -81,14 +82,15 @@ ifthen = do
 
 letvar :: Parser Expr
 letvar = do
-  reserved "let"
+  reserved "using"
   defs <- commaSep $ do
     var <- identifier
     reservedOp "="
     val <- expr
     return (var, val)
-  reserved "in"
+  colon
   body <- expr
+  reserved "end"
 
   return $ foldr (uncurry Let) body defs
 
@@ -115,6 +117,7 @@ factor =
   <|> try call
   <|> try variable
   <|> ifthen
+  <|> try letvar
   <|> for
   <|> (parens expr)
 

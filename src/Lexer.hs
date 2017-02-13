@@ -16,6 +16,7 @@ lexer =
         , "/"
         , ","
         , ">"
+        , "<"
         , "="
         ]
 
@@ -27,8 +28,7 @@ lexer =
         , "then"
         , "else"
         , "end"
-        , "let"
-        , "in"
+        , "using"
         ]
 
       style =
