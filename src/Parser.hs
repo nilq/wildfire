@@ -49,7 +49,9 @@ function = do
   reserved "func"
   name <- identifier
   args <- many identifier
-  body <- braces $ expr
+  colon
+  body <- expr
+  reserved "end"
   return $ Function name args body
 
 extern :: Parser Expr
@@ -69,12 +71,26 @@ ifthen :: Parser Expr
 ifthen = do
   reserved "if"
   cond    <- expr
-  reserved "then"
+  colon
   tr       <- expr
   reserved "else"
   fl       <- expr
+  reserved "end"
 
   return $ If cond tr fl
+
+letvar :: Parser Expr
+letvar = do
+  reserved "let"
+  defs <- commaSep $ do
+    var <- identifier
+    reservedOp "="
+    val <- expr
+    return (var, val)
+  reserved "in"
+  body <- expr
+
+  return $ foldr (uncurry Let) body defs
 
 for :: Parser Expr
 for = do
@@ -86,8 +102,9 @@ for = do
   cond <- expr
   reservedOp ","
   step <- expr
-  reserved "in"
+  colon
   body <- expr
+  reserved "end"
 
   return $ For var start cond step body
 
@@ -116,7 +133,6 @@ contents p = do
 toplevel :: Parser [Expr]
 toplevel = many $ do
   def <- defn
-  reservedOp ";"
   return def
 
 parseExpr :: String -> Either ParseError Expr

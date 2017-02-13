@@ -5,6 +5,7 @@ type Name =
 
 data Expr =
     Float Double
+  | Int Integer
   | Var String
   | Call Name [Expr]
   | Function Name [Name] Expr

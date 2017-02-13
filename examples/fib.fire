@@ -2,15 +2,18 @@
 # hello
 
 # function import test
-summon sin x;
+summon sin x
 
-func fib x {
-  if x < 3 then
+func fib x:
+  if x < 3:
     1
   else
     fib(x - 1) + fib(x - 2)
-};
+  end
+end
 
-func main {
-  fib(10)
-};
+func main:
+  for i = 1, i < 10, 1.0:
+    fib(i)
+  end
+end

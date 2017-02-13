@@ -16,14 +16,19 @@ lexer =
         , "/"
         , ","
         , ">"
+        , "="
         ]
 
       names =
         [ "func"
         , "summon"
+        , "for"
         , "if"
         , "then"
         , "else"
+        , "end"
+        , "let"
+        , "in"
         ]
 
       style =
