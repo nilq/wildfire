@@ -56,7 +56,7 @@ extern :: Parser Expr
 extern = do
   reserved "summon"
   name <- identifier
-  args <- parens $ many identifier
+  args <- many identifier
   return $ Extern name args
 
 call :: Parser Expr

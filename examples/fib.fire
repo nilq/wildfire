@@ -1,8 +1,14 @@
+# this is a comment, working v well 10/10
+# hello
+
+# function import test
+summon sin x;
+
 func fib x {
   if x < 3 then
     1
   else
-    (fib(x - 1) + fib(x - 2))
+    fib(x - 1) + fib(x - 2)
 };
 
 func main {
