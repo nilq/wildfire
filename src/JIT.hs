@@ -45,14 +45,14 @@ runJIT mod = do
           optmod <- moduleAST m
           s      <- moduleLLVMAssembly m
 
-          putStrLn s
+          -- putStrLn s
 
           EE.withModuleInEngine executionEngine m $ \ee -> do
             mainfn <- EE.getFunction ee (AST.Name "main")
             case mainfn of
               Just fn -> do
                 res <- run fn
-                putStrLn $ "Evaluated to: " ++ show res
+                putStrLn $ ""
               Nothing -> return ()
 
           return optmod

@@ -5,6 +5,8 @@ import Parser
 import Codegen
 import Emit
 
+import JIT
+
 import Control.Monad.Trans
 
 import System.IO
@@ -16,9 +18,6 @@ import qualified LLVM.General.AST.Float as F
 import qualified LLVM.General.AST.Constant as C
 
 import Foreign.C.Types
-
-foreign import ccall safe "print_char" print_char
-    :: CDouble -> CInt
 
 initModule :: AST.Module
 initModule =
